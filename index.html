@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		
+		<style>
+		#article {
+			border: 1px solid;
+			border-color: gray;
+			margin-top: 5px;
+		}
+		
+		</style>
+		
+	</head>
+	<body>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
+		<script type="text/javascript">
+			var thisweek = moment().week();
+			
+			d3.select("title")
+				.text("Kitchen Window - Week " + thisweek);
+			
+			d3.csv("articles.csv")
+				.get(function(error, rows) { 
+					
+					var posts = find_articles(error, rows, thisweek);
+					
+					var divs = d3.select("body")
+						.selectAll("div")
+						.data(posts)
+						.enter()
+						.append("div")
+						.attr("id", "article")
+						.attr("class", "container");
+					
+					divs.append("a")
+						.attr("href", function (d) { return d.url; })
+						.attr("target", "_blank")
+						.text( function(d) { return d.title; });
+					
+					divs.append("span")
+						.attr("class", "date")
+						.text( function(d) { return " - " + d.pub_date; });
+					
+					divs.append("div")
+						.text( function(d) { return d.teaser; });
+						
+				});
+			
+			function find_articles(error, rows, thisweek) {
+				var articles = []
+				for (var i = 0; i < rows.length; i++) {
+					if (+rows[i].week === thisweek) {
+						articles.push(rows[i])
+					}
+				}
+				return articles
+			}
+			
+		</script>
+	</body>
+</html>
