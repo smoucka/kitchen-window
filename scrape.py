@@ -14,16 +14,22 @@ def ignore_ascii(text, date):
 
 with open('articles.csv', 'wb') as c:
 	csvwriter = csv.writer(c)
-	csvwriter.writerow(['pub_date', 'title', 'teaser', 'url'])
-	for page in range(1, 481, 15):
+	csvwriter.writerow(['pub_date', 'title', 'teaser', 'url', 'img_url'])
+	for page in range(1, 485, 15):
 		r = requests.get(base + str(page))
 		soup = BeautifulSoup(r.text)
-		articles = soup.find_all('div', class_='item-info')
-		for art in articles:
-			row = []
-			row.append(art.p.time['datetime'])
-			row.append(ignore_ascii(art.h1.a.string, row[0]))
-			tease = ignore_ascii(art.p.find('a').contents[1], row[0])
-			row.append(tease)
-			row.append(art.h1.a['href'])
-			csvwriter.writerow(row)
+		articles = soup.find_all('article')
+		for article in articles:
+			if article['class'][0] == 'item':
+				row = []
+				itemdiv = article.find('div', class_='item-info')
+				row.append(itemdiv.p.time['datetime'])
+				row.append(ignore_ascii(itemdiv.h1.a.string, row[0]))
+				tease = ignore_ascii(itemdiv.p.find('a').contents[1], row[0])
+				row.append(tease)
+				row.append(itemdiv.h1.a['href'])
+				if article['class'][1] == 'has-image':
+					row.append(article.img['src'])
+				else:
+					row.append('')
+				csvwriter.writerow(row)
