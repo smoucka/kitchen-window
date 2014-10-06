@@ -7,16 +7,39 @@
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 		
 		<style>
+		h1 {
+			font-weight: bold;
+		}
+		p {
+			font-size: large;
+		}
+		
+		.container {
+			max-width: 75%;
+		}
+		
 		#article {
 			border: 1px solid;
 			border-color: gray;
 			margin-top: 5px;
 		}
 		
+		img {
+			max-height: 120px;
+			max-width: 160px;
+			margin-bottom: 5px;
+			margin-top: 5px;
+			float: right;
+		}
 		</style>
 		
 	</head>
 	<body>
+		<div class="container week">
+		</div>
+		<div class="container intro">
+			<p>NPR's Kitchen Window blog through history. A compilation of posts by week of the year.</p>
+		</div>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
 		<script type="text/javascript">
@@ -24,6 +47,10 @@
 			
 			d3.select("title")
 				.text("Kitchen Window - Week " + thisweek);
+			
+			d3.select("div.week")
+				.append("h1")
+				.text("NPR's Kitchen Window - Week " + thisweek);
 			
 			d3.csv("articles.csv")
 				.get(function(error, rows) { 
@@ -36,7 +63,16 @@
 						.enter()
 						.append("div")
 						.attr("id", "article")
-						.attr("class", "container");
+						.attr("class", function(d) {
+							if (d.img_url != "") {
+								return "container has-image";
+							} else {
+								return "container no-image";
+							}
+						});
+
+					divs.append("img")
+						.attr("src", function(d) { return d.img_url; });
 					
 					divs.append("a")
 						.attr("href", function (d) { return d.url; })
@@ -49,7 +85,8 @@
 					
 					divs.append("div")
 						.text( function(d) { return d.teaser; });
-						
+					
+					
 				});
 			
 			function find_articles(error, rows, thisweek) {
