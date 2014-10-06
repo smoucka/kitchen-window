@@ -58,7 +58,7 @@
 					var posts = find_articles(error, rows, thisweek);
 					
 					var divs = d3.select("body")
-						.selectAll("div")
+						.selectAll("div.article")
 						.data(posts)
 						.enter()
 						.append("div")
