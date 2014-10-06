@@ -10,18 +10,40 @@
 		h1 {
 			font-weight: bold;
 		}
+		
 		p {
 			font-size: large;
 		}
 		
+		.page-links {
+			font-size: large;
+			width: 100%;
+		}
+		
+		.this_week {
+			float: right;
+			position: relative;
+			left: -50%;
+		}
+		
+		.next {
+			float: right;
+			position: relative;
+		}
+		
+		.content {
+			margin-bottom: 10px;
+		}
+		
 		.container {
-			max-width: 75%;
+			width: 75%;
 		}
 		
 		#article {
 			border: 1px solid;
-			border-color: gray;
+			border-color: #CCCCCC;
 			margin-top: 5px;
+			width: 100%
 		}
 		
 		img {
@@ -36,69 +58,103 @@
 	</head>
 	<body>
 		<div class="container week">
+			<h1></h1>
 		</div>
 		<div class="container intro">
 			<p>NPR's Kitchen Window blog through history. A compilation of posts by week of the year.</p>
 		</div>
+		<div class="container page-links">
+			<a class="prev" onclick="prev_week()"></a>
+			<a class="this_week" onclick="current_week()">Current Week</a>
+			<a class="next" onclick="next_week()"></a>
+		</div>
+		<div class="container content">
+		</div>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
 		<script type="text/javascript">
-			var thisweek = moment().week();
-			
-			d3.select("title")
-				.text("Kitchen Window - Week " + thisweek);
-			
-			d3.select("div.week")
-				.append("h1")
-				.text("NPR's Kitchen Window - Week " + thisweek);
-			
-			d3.csv("articles.csv")
-				.get(function(error, rows) { 
-					
-					var posts = find_articles(error, rows, thisweek);
-					
-					var divs = d3.select("body")
-						.selectAll("div.article")
-						.data(posts)
-						.enter()
-						.append("div")
-						.attr("id", "article")
-						.attr("class", function(d) {
-							if (d.img_url != "") {
-								return "container has-image";
-							} else {
-								return "container no-image";
-							}
-						});
+			var target_week = moment().week();
 
-					divs.append("img")
-						.attr("src", function(d) { return d.img_url; });
-					
-					divs.append("a")
-						.attr("href", function (d) { return d.url; })
-						.attr("target", "_blank")
-						.text( function(d) { return d.title; });
-					
-					divs.append("span")
-						.attr("class", "date")
-						.text( function(d) { return " - " + d.pub_date; });
-					
-					divs.append("div")
-						.text( function(d) { return d.teaser; });
-					
-					
-				});
+			d3.select("title")
+				.text("Kitchen Window - Week " + target_week);
 			
-			function find_articles(error, rows, thisweek) {
+			load();
+			
+			function prev_week() {
+				target_week--;
+				d3.selectAll("#article").remove()
+				load();
+			}
+			
+			function current_week() {
+				target_week = moment().week();
+				d3.selectAll("#article").remove()
+				load();
+			}
+			
+			function next_week() {
+				target_week++;
+				d3.selectAll("#article").remove()
+				load();
+			}
+			
+			function load() {
+				d3.csv("articles.csv")
+					.get(function(error, rows) { 
+						
+						d3.select("h1")
+							.text("NPR's Kitchen Window - Week " + target_week);
+						
+						d3.select("a.prev")
+							.text("<<< Week " + (target_week - 1))
+						
+						d3.select("a.next")
+							.text("Week " + (target_week + 1) + " >>>")
+						
+						var posts = find_articles(error, rows, target_week);
+						
+						var divs = d3.select("div.content")
+							.selectAll("div.article")
+							.data(posts)
+							.enter()
+							.append("div")
+							.attr("id", "article")
+							.attr("class", function(d) {
+								if (d.img_url != "") {
+									return "container has-image";
+								} else {
+									return "container no-image";
+								}
+							});
+
+						divs.append("img")
+							.attr("src", function(d) { return d.img_url; });
+						
+						divs.append("a")
+							.attr("href", function (d) { return d.url; })
+							.attr("target", "_blank")
+							.text( function(d) { return d.title; });
+						
+						divs.append("span")
+							.attr("class", "date")
+							.text( function(d) { return " - " + d.pub_date; });
+						
+						divs.append("div")
+							.text( function(d) { return d.teaser; });
+						
+						
+					});
+			}
+			
+			function find_articles(error, rows, target_week) {
 				var articles = []
 				for (var i = 0; i < rows.length; i++) {
-					if (+rows[i].week === thisweek) {
+					if (+rows[i].week === target_week) {
 						articles.push(rows[i])
 					}
 				}
 				return articles
 			}
-			
 		</script>
 	</body>
 </html>
