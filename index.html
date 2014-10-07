@@ -7,36 +7,35 @@
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 		
 		<style>
+		.container {
+			width: 75%;
+		}
+
+		.clear {
+
+		}
+
 		h1 {
 			font-weight: bold;
 		}
 		
-		p {
+		.intro {
 			font-size: large;
 		}
-		
-		.page-links {
+
+		ul {
+			padding: 0;
+		}
+
+		li {
+			display: inline-block;
+			list-style-type: none;
 			font-size: large;
-			width: 100%;
+			margin: 0 20px;
 		}
-		
-		.this_week {
-			float: right;
-			position: relative;
-			left: -50%;
-		}
-		
-		.next {
-			float: right;
-			position: relative;
-		}
-		
-		.content {
+
+		#content {
 			margin-bottom: 10px;
-		}
-		
-		.container {
-			width: 75%;
 		}
 		
 		#article {
@@ -57,18 +56,22 @@
 		
 	</head>
 	<body>
-		<div class="container week">
+		<div class="container">
 			<h1></h1>
-		</div>
-		<div class="container intro">
-			<p>NPR's Kitchen Window blog through history. A compilation of posts by week of the year.</p>
-		</div>
-		<div class="container page-links">
-			<a class="prev" onclick="prev_week()"></a>
-			<a class="this_week" onclick="current_week()">Current Week</a>
-			<a class="next" onclick="next_week()"></a>
-		</div>
-		<div class="container content">
+			<div class="intro">
+				<p>NPR's Kitchen Window blog over the years. A compilation of posts by week of the year.</p>
+			</div>
+			<div class="page-links">
+				<ul class="link-list">
+					<li><a class="prev" onclick="prev_week()"></a></li>
+					<li><a class="this_week" onclick="current_week()">Current Week</a></li>
+					<li><a class="next" onclick="next_week()"></a></li>
+				</ul>
+				<div class="clear"></div>
+			</div>
+			<div class="clear"></div>
+			<div id="content">
+			</div>
 		</div>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
@@ -82,23 +85,22 @@
 			
 			function prev_week() {
 				target_week--;
-				d3.selectAll("#article").remove()
 				load();
 			}
 			
 			function current_week() {
 				target_week = moment().week();
-				d3.selectAll("#article").remove()
 				load();
 			}
 			
 			function next_week() {
 				target_week++;
-				d3.selectAll("#article").remove()
 				load();
 			}
 			
 			function load() {
+				d3.selectAll("#article").remove()
+
 				d3.csv("articles.csv")
 					.get(function(error, rows) { 
 						
@@ -113,7 +115,7 @@
 						
 						var posts = find_articles(error, rows, target_week);
 						
-						var divs = d3.select("div.content")
+						var divs = d3.select("div#content")
 							.selectAll("div.article")
 							.data(posts)
 							.enter()
